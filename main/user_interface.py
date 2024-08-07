@@ -11,6 +11,8 @@ def user_interface():
                     print(command)
             case "quit":
                 break
+            case "Add":
+                print("Adding file")
 
 if __name__ == "__main__":
     print("To see all commands, type 'help'.")
