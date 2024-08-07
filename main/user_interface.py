@@ -1,5 +1,6 @@
 from typing import List
 
+
 def user_interface():
     console_user_command: str = None
     commands_list: List[str] = ["help", "quit"]
@@ -13,6 +14,7 @@ def user_interface():
                 break
             case "Add":
                 print("Adding file")
+
 
 if __name__ == "__main__":
     print("To see all commands, type 'help'.")
