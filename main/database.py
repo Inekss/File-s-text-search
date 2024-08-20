@@ -66,14 +66,6 @@ def error_handling(report: list):
             with open(file_path, "w") as json_file:
                 json.dump({}, json_file)
 
-        try:
-            with open(file_path, "r") as json_file:
-                existing_data = json.load(json_file)
-        except json.JSONDecodeError:
-            existing_data = {}
-            with open(file_path, "w") as json_file:
-                json.dump(existing_data, json_file, indent=4)
-
         with open(file_path, "r") as json_file:
             existing_data = json.load(json_file)
 
