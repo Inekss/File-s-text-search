@@ -3,14 +3,15 @@ import json
 
 
 def storing(request: str, data: object):
-    error = [["error_message", ""], ["error_status", False]]
+    error_report = [["error_status", False], ["error_type", ""], ["error_message", ""]]
     files = ["file_info.json", "processed_data.json", "error_data.json"]
     if request not in files:
-        error = [
-            ["error_message", "Error: No such file in data storage"],
+        error_report = [
             ["error_status", True],
+            ["error_type", "incorrect_parameter_value"],
+            ["error_message", "Error: No such file in data storage"],
         ]
-        return error
+        return error_report
 
     # To create all data_storage file at once
     directory_path = r".\main\data_storage"
@@ -27,30 +28,26 @@ def storing(request: str, data: object):
             existing_data = json.load(json_file)
     except json.JSONDecodeError:
         existing_data = {}
-        error = [
-            [
-                "error_message",
-                f"Error: corrupted json file, all data deleted from {directory_path}",
-            ],
+        error_report = [
             ["error_status", True],
+            ["error_type", "corrupted_file"],
+            ["error_message", "Error: corrupted json file, all data deleted"],
         ]
-        return error
 
     try:
         existing_data.update(data)
     except Exception:
-        error = [
-            ["error_message", f"Error: problems with dara format"],
+        error_report = [
             ["error_status", True],
+            ["error_type", "incorrect_data_format"],
+            ["error_message", f"Error: problems with data format"],
         ]
-        return error
+        return error_report
 
     with open(directory_path, "w") as json_file:
         json.dump(existing_data, json_file, indent=4)
 
-    return error
-    # if error_status is false there is no error
-    # Here a need to think about error object name
+    return error_report
 
 
 if __name__ == "__main__":
