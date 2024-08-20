@@ -4,9 +4,7 @@ import json
 
 def storing(request: str, data: object):
     error = [["error_message", ""], ["error_status", False]]
-    directory_path = r".\main\data_storage"
     files = ["file_info.json", "processed_data.json", "error_data.json"]
-    create_new_file = {}
     if request not in files:
         error = [
             ["error_message", "Error: No such file in data storage"],
@@ -15,6 +13,8 @@ def storing(request: str, data: object):
         return error
 
     # To create all data_storage file at once
+    directory_path = r".\main\data_storage"
+    create_new_file = {}
     for file_name in files:
         if file_name not in os.listdir(directory_path):
             file_name = os.path.join(directory_path, file_name)
