@@ -6,7 +6,7 @@ import time
 def data_storage_constructor():
     files = ["file_info.json", "processed_data.json", "error_data.json"]
 
-    # To create all data_storage file at once
+    # To create all data_storage files at once
     directory_path = r".\main\data_storage"
     for file_name in files:
         data_path = rf".\main\data_storage\{file_name}.json"
@@ -15,12 +15,12 @@ def data_storage_constructor():
                 json.dump({}, json_file)
 
 
-def files_properties(properties: list):
+def files_properties(properties: dict):
     if (
-        properties[0][0] == "file_path"
-        and properties[1][0] == "file_name"
-        and properties[2][0] == "file_size"
-        and properties[3][0] == "file_format"
+        properties.get("file_path")
+        and properties.get("file_name")
+        and properties.get("file_size")
+        and properties.get("file_format")
     ):
 
         data_path = r".\main\data_storage\file_info.json"
@@ -34,50 +34,51 @@ def files_properties(properties: list):
         except json.JSONDecodeError:
             with open(data_path, "w") as json_file:
                 json.dump({}, json_file)
-            errors_report = [
-                ["error_status", True],
-                ["error_type", "corrupted_file"],
-                ["error_message", data_path],
-                ["error_description", "Error: corrupted json file, all data deleted"],
-                ["error_time", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())],
-            ]
+            errors_report = {
+                "error_status": True,
+                "error_type": "corrupted_file",
+                "error_message": data_path,
+                "error_description": "Error: corrupted json file, all data deleted",
+                "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            }
             error_handling(errors_report)
             return
 
-        properties_dict = dict(properties)
-        properties_path = properties_dict.pop("file_path")
-        if properties_path in existing_data:
-            existing_data[properties_path].append(properties_dict)
+        properties_path = properties.pop("file_path")
+
+        if properties_path not in existing_data:
+            existing_data[properties_path] = {}
+
+        file_name = properties.get("file_name")
+
+        if file_name in existing_data[properties_path]:
+            existing_data[properties_path][file_name].update(properties)
         else:
-            existing_data[properties_path] = [properties_dict]
+            existing_data[properties_path][file_name] = properties
 
         with open(data_path, "w") as json_file:
             json.dump(existing_data, json_file, indent=4)
 
     else:
-        errors_report = [
-            ["error_status", True],
-            ["error_type", "incorrect_parameters"],
-            ["error_message", "parameters"],
-            [
-                "error_description",
-                "Error: files_properties has 4 parameters, each has own location",
-            ],
-            ["error_time", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())],
-        ]
+        errors_report = {
+            "error_status": True,
+            "error_type": "incorrect_parameters",
+            "error_message": "parameters",
+            "error_description": "Error: files_properties requires 4 parameters, each has its own location",
+            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        }
         error_handling(errors_report)
 
 
-def search_results(processed_data: list):
-    if processed_data[0][0] == "file_path" and (
+def search_results(processed_data: dict):
+    if processed_data.get("file_path") and (
         (
-            processed_data[1][0] == "search_request"
-            and processed_data[2][0] == "search_result"
-            and processed_data[3][0] == "search_status"
+            processed_data.get("search_request")
+            and processed_data.get("search_result")
+            and processed_data.get("search_status")
         )
-        or processed_data[1][0] == "global_result"
+        or processed_data.get("global_result")
     ):
-
         data_path = r".\main\data_storage\processed_data.json"
         if not os.path.isfile(data_path):
             with open(data_path, "w") as json_file:
@@ -89,118 +90,56 @@ def search_results(processed_data: list):
         except json.JSONDecodeError:
             with open(data_path, "w") as json_file:
                 json.dump({}, json_file)
-            errors_report = [
-                ["error_status", True],
-                ["error_type", "corrupted_file"],
-                ["error_message", data_path],
-                ["error_description", "Error: corrupted json file, all data deleted"],
-                ["error_time", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())],
-            ]
+            errors_report = {
+                "error_status": True,
+                "error_type": "corrupted_file",
+                "error_message": data_path,
+                "error_description": "Error: corrupted json file, all data deleted",
+                "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            }
             error_handling(errors_report)
             return
 
-        processed_data_dict = dict(processed_data)
+        file_path = processed_data.pop("file_path")
 
-        # Extract the file path and remove it from processed_data_dict
-        file_path = processed_data_dict.pop("file_path")
+        if "search_request" in processed_data:
+            search_request_key = processed_data["search_request"]
 
-        if processed_data[1][0] == "search_request":
+            if file_path not in existing_data:
+                existing_data[file_path] = {}
 
-            # Create the search request dictionary
-            search_request_dict = {"request": processed_data_dict}
-
-            # Check if the file_path already exists in existing_data
-            if file_path in existing_data:
-                existing_entry = existing_data[file_path]
-
-                # If the existing entry is a single request, wrap it in a list
-                if "reauest" in existing_entry:
-                    if isinstance(existing_entry, dict):
-                        existing_entry = [existing_entry]
-
-                    # Check if the new search request matches any existing request
-                    matching_request = next(
-                        (
-                            req
-                            for req in existing_entry
-                            if req["request"]["search_request"]
-                            == search_request_dict["request"]["search_request"]
-                        ),
-                        None,
-                    )
-
-                    if matching_request:
-                        # Update the matching request
-                        matching_request["request"].update(
-                            search_request_dict["request"]
-                        )
-                    else:
-                        # Append the new search request to the list
-                        existing_entry.append(search_request_dict)
-
-                    # Update the entry in existing_data
-                    existing_data[file_path] = existing_entry
-                else:
-                    # Initialize a new entry with the search request
-                    existing_data[file_path].append(processed_data_dict)
+            if search_request_key in existing_data[file_path]:
+                existing_data[file_path][search_request_key].update(processed_data)
             else:
-                # Initialize a new entry with the search request
-                existing_data[file_path].append(processed_data_dict)
+                existing_data[file_path][search_request_key] = processed_data
 
-        elif processed_data[1][0] == "global_result":
+        elif "global_result" in processed_data:
+            if file_path not in existing_data:
+                existing_data[file_path] = {}
 
-            if file_path in existing_data:
-
-                global_result_updated = False
-
-                # Iterate through the list to find and update the existing global_result
-
-                for entry in existing_data[file_path]:
-
-                    if "global_result" in entry:
-                        # Update the global_result value with the new one
-
-                        entry["global_result"] = processed_data_dict["global_result"]
-
-                        global_result_updated = True
-
-                        break
-
-                if not global_result_updated:
-                    # If no matching global_result was found, append the new one
-
-                    existing_data[file_path].append(processed_data_dict)
-
-            else:
-
-                # Initialize a new entry with processed_data_dict if file_path does not exist
-
-                existing_data[file_path] = [processed_data_dict]
+            existing_data[file_path]["global_result"] = processed_data["global_result"]
 
         with open(data_path, "w") as json_file:
             json.dump(existing_data, json_file, indent=4)
 
     else:
-        errors_report = [
-            ["error_status", True],
-            ["error_type", "incorrect_parameters"],
-            ["error_message", "parameters"],
-            [
-                "error_description",
-                "Error: search_results has 3 or 2 parameters, each has own location",
-            ],
-            ["error_time", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())],
-        ]
+        errors_report = {
+            "error_status": True,
+            "error_type": "incorrect_parameters",
+            "error_message": "parameters",
+            "error_description": "Error: search_results requires 3 or 2 parameters, each has its own location",
+            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        }
         error_handling(errors_report)
 
 
-def error_handling(report: list):
+def error_handling(report: dict):
     if (
-        report[0][1]
-        and report[1][0] == "error_type"
-        and report[2][0] == "error_message"
-        and report[3][0] == "error_description"
-        and report[4][0] == "error_time"
+        report.get("error_status")
+        and report.get("error_type")
+        and report.get("error_message")
+        and report.get("error_description")
+        and report.get("error_time")
     ):
         data_path = r".\main\data_storage\error_data.json"
         if not os.path.isfile(data_path):
@@ -213,58 +152,49 @@ def error_handling(report: list):
         except json.JSONDecodeError:
             with open(data_path, "w") as json_file:
                 json.dump({}, json_file)
-            errors_report = [
-                ["error_status", True],
-                ["error_type", "corrupted_file"],
-                ["error_message", data_path],
-                ["error_description", "Error: corrupted json file, all data deleted"],
-                ["error_time", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())],
-            ]
+            errors_report = {
+                "error_status": True,
+                "error_type": "corrupted_file",
+                "error_message": data_path,
+                "error_description": "Error: corrupted json file, all data deleted",
+                "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            }
             error_handling(errors_report)
             return
 
-        report_dict = dict(report)
-        error_type = report_dict.pop("error_type")
-        error_time = report_dict.get("error_time")
+        error_type = report.pop("error_type")
+        error_time = report.get("error_time")
 
-        if error_type in existing_data:
-            if error_time in [
-                entry.get("error_time") for entry in existing_data[error_type]
-            ]:
-                for entry in existing_data[error_type]:
-                    if entry.get("error_time") == error_time:
-                        entry.update(report_dict)
-                        break
-                pass
-            else:
-                existing_data[error_type].append(report_dict)
+        if error_type not in existing_data:
+            existing_data[error_type] = {}
+
+        if error_time in existing_data[error_type]:
+            existing_data[error_type][error_time].update(report)
         else:
-            existing_data[error_type] = [report_dict]
+            existing_data[error_type][error_time] = report
 
         with open(data_path, "w") as json_file:
             json.dump(existing_data, json_file, indent=4)
+
     else:
-        errors_report = [
-            ["error_status", True],
-            ["error_type", "incorrect_parameters"],
-            ["error_message", "parameters"],
-            [
-                "error_description",
-                "Error: error_handling has 5 parameters, each has own location",
-            ],
-            ["error_time", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())],
-        ]
+        errors_report = {
+            "error_status": True,
+            "error_type": "incorrect_parameters",
+            "error_message": "parameters",
+            "error_description": "Error: error_handling requires 5 parameters, each has its own location",
+            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        }
         error_handling(errors_report)
 
 
 if __name__ == "__main__":
-    print()
-    # processed_data = [
-    #     ["file_path", "home"],
-    #     ["search_request", "hh"],
-    #     ["search_result", "hh"],
-    #     ["search_status", "hh"],
-    # ]
+    # print()
+    # processed_data = {
+    #     "file_path": "my",
+    #     "search_request": "ddd",
+    #     "search_result": "hh",
+    #     "search_status": "hh",
+    # }
 
     # or
 
@@ -275,12 +205,12 @@ if __name__ == "__main__":
     # search_results(processed_data)
 
     # path = r".\main\data_storage\processed_data.json"
-    # properties = [
-    #     ["file_path", path],
-    #     ["file_name", "name"],
-    #     ["file_size", "size"],
-    #     ["file_format", "format"],
-    # ]
+    # properties = {
+    #     "file_path": path,
+    #     "file_name": "name",
+    #     "file_size": "size",
+    #     "file_format": "format",
+    # }
     # files_properties(properties)
 
     # datalist = {"some data": 1, "some other data": 2}
@@ -288,12 +218,12 @@ if __name__ == "__main__":
 
     # testing error_handling function
 
-    # error_report = [
-    #    ["error_status", True],
-    #    ["error_type", "corrupted_file"],
-    #    ["error_message", datalist],
-    #    ["error_description", "Error: corrupted json file, all data deleted"],
-    #    ["error_time", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())],
-    #    ["hello", "world"]
-    # ]
+    # error_report = {
+    #    "error_status": True,
+    #    "error_type": "corrupted_file",
+    #    "error_message": datalist,
+    #    "error_description": "Error: corrupted json file, all data deleted",
+    #    "error_time": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
+    #    "hello": "world"
+    # }
     # error_handling(error_report)
