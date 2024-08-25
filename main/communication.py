@@ -1,4 +1,3 @@
-import tkinter as tk
 from tkinter import filedialog
 import os
 
@@ -33,19 +32,5 @@ def file_picker(user_command: str, call_picker: bool):
             else:
                 print("No file selected")
 
-        if user_command == "folder":
-            folder_path = filedialog.askdirectory(title="Select a Folder")
-
-            # Process the selected folder
-            if folder_path:
-                print(f"Folder selected: {folder_path}")
-                # Add further processing of the folder here
-            else:
-                print("No folder selected")
     else:
         print("File picker was not called because the parameter was set to False.")
-
-
-if __name__ == "__main__":
-    command = "file"
-    file_picker(command, call_picker=True)
