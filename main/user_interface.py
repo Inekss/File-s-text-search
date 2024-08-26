@@ -1,28 +1,46 @@
-from typing import List
+from communication import file_picker
 
 
 def user_interface():
-    console_user_command: str = None
-    commands_list: List[str] = [
-        "help", "-h",
-        "quit", "-q",
-        "show-history", "-ch",
-        "add-file", "-a -f",
-        "add-folder", "-a -d",
-        "add-file-path", "-a -f -p",
-        "add-folder-path", "-a -d -p",
-        "clear-database", "-rm -c",
-        "remove-file", "-rm -f",
-        "remove-folder", "-rm -d",
-        "search-req-all", "-s -all",
-        "search-req-file", "-s -f",
-        "search-req-folder", "-s -d",
-        "search-req-group", "-s -list",
-        "search-req-multiple", "-s -multi",
-        "show-files", "-t -f",
-        "show-data", "-t -i",
-        "show-errors", "-t -e",
-        "show-all", "-t -all"
+    commands_list = [
+        "help",
+        "-h",
+        "quit",
+        "-q",
+        "show-history",
+        "-ch",
+        "add-file",
+        "-a -f",
+        "add-folder",
+        "-a -d",
+        "add-file-path",
+        "-a -f -p",
+        "add-folder-path",
+        "-a -d -p",
+        "clear-database",
+        "-rm -c",
+        "remove-file",
+        "-rm -f",
+        "remove-folder",
+        "-rm -d",
+        "search-req-all",
+        "-s -all",
+        "search-req-file",
+        "-s -f",
+        "search-req-folder",
+        "-s -d",
+        "search-req-group",
+        "-s -list",
+        "search-req-multiple",
+        "-s -multi",
+        "show-files",
+        "-t -f",
+        "show-data",
+        "-t -i",
+        "show-errors",
+        "-t -e",
+        "show-all",
+        "-t -all",
     ]
     while True:
         console_user_command = input("Enter a command: ")
@@ -37,6 +55,7 @@ def user_interface():
                 print("Showing command history...")
             case "add-file" | "-a -f":
                 print("Adding file manually...")
+                file_picker()
             case "add-folder" | "-a -d":
                 print("Adding folder manually...")
             case "add-file-path" | "-a -f -p":
@@ -72,5 +91,4 @@ def user_interface():
 
 
 if __name__ == "__main__":
-    print("To see all commands, type 'help'.")
     user_interface()
