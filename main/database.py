@@ -187,43 +187,41 @@ def error_handling(report: dict):
         error_handling(errors_report)
 
 
-if __name__ == "__main__":
-    # print()
-    # processed_data = {
-    #     "file_path": "my",
-    #     "search_request": "ddd",
-    #     "search_result": "hh",
-    #     "search_status": "hh",
-    # }
+# if __name__ == "__main__":
+# print()
+# processed_data = {
+#     "file_path": "my",
+#     "search_request": "ddd",
+#     "search_result": "hh",
+#     "search_status": "hh",
+# }
 
-    # or
+# or
 
-    # processed_data = [
-    #     ["file_path", "home"],
-    #     ["global_result", "hh"],
-    # ]
-    # search_results(processed_data)
+# processed_data = {
+#     "file_path": "home",
+#     "global_result": "hh",
+# }
+# search_results(processed_data)
 
-    # path = r".\main\data_storage\processed_data.json"
-    # properties = {
-    #     "file_path": path,
-    #     "file_name": "name",
-    #     "file_size": "size",
-    #     "file_format": "format",
-    # }
-    # files_properties(properties)
+# path = r".\main\data_storage\processed_data.json"
+# properties = {
+#     "file_path": path,
+#     "file_name": "name",
+#     "file_size": "size",
+#     "file_format": "format",
+# }
+# files_properties(properties)
 
-    # datalist = {"some data": 1, "some other data": 2}
-    # storing("processed_data.json", datalist)
+# datalist = {"some data": 1, "some other data": 2}
 
-    # testing error_handling function
+# testing error_handling function
 
-    # error_report = {
-    #    "error_status": True,
-    #    "error_type": "corrupted_file",
-    #    "error_message": datalist,
-    #    "error_description": "Error: corrupted json file, all data deleted",
-    #    "error_time": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-    #    "hello": "world"
-    # }
-    # error_handling(error_report)
+# error_report = {
+#    "error_status": True,
+#    "error_type": "corrupted_file",
+#    "error_message": datalist,
+#    "error_description": "Error: corrupted json file, all data deleted",
+#    "error_time": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
+# }
+# error_handling(error_report)
