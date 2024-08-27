@@ -45,15 +45,10 @@ def files_properties(properties: dict):
 
         properties_path = properties.pop("file_path")
 
-        if properties_path not in existing_data:
-            existing_data[properties_path] = {}
-
-        file_name = properties.get("file_name")
-
-        if file_name in existing_data[properties_path]:
-            existing_data[properties_path][file_name].update(properties)
+        if properties_path in existing_data:
+            existing_data[properties_path].update(properties)
         else:
-            existing_data[properties_path][file_name] = properties
+            existing_data[properties_path] = properties
 
         with open(data_path, "w") as json_file:
             json.dump(existing_data, json_file, indent=4)
