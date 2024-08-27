@@ -41,8 +41,7 @@ def files_properties(properties: dict):
                 "error_description": "Error: corrupted json file, all data deleted",
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             }
-            error_handling(errors_report)
-            return
+            return errors_report
 
         properties_path = properties.pop("file_path")
 
@@ -97,8 +96,7 @@ def search_results(processed_data: dict):
                 "error_description": "Error: corrupted json file, all data deleted",
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             }
-            error_handling(errors_report)
-            return
+            return errors_report
 
         file_path = processed_data.pop("file_path")
 
@@ -159,8 +157,7 @@ def error_handling(report: dict):
                 "error_description": "Error: corrupted json file, all data deleted",
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             }
-            error_handling(errors_report)
-            return
+            return errors_report
 
         error_type = report.pop("error_type")
         error_time = report.get("error_time")

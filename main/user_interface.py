@@ -1,7 +1,9 @@
 from communication import file_picker
+import database as db
 
 
 def user_interface():
+    result = ""
     commands_list = [
         "help",
         "-h",
@@ -55,7 +57,7 @@ def user_interface():
                 print("Showing command history...")
             case "add-file" | "-a -f":
                 print("Adding file manually...")
-                file_picker()
+                result = file_picker()
             case "add-folder" | "-a -d":
                 print("Adding folder manually...")
             case "add-file-path" | "-a -f -p":
@@ -89,6 +91,20 @@ def user_interface():
             case _:
                 print("Unknown command. Type 'help' or '-h' for a list of commands.")
 
+        if (
+            "error_type" in result
+            and "error_status" in result
+            and result["error_status"] == True
+        ):
+            db.error_handling(result)
+            print(result)
+        elif "file_path" in result and "file_format" in result:
+            db.files_properties(result)
+            print(result)
+        else:
+            print(result)
+
 
 if __name__ == "__main__":
+    print("To see all commands, type 'help'.")
     user_interface()
