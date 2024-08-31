@@ -2,7 +2,7 @@ from communication import file_picker
 import database as db
 
 
-def user_interface():
+def user_interface() -> object:
     result = ""
     commands_list = [
         "help",
