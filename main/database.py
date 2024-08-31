@@ -6,8 +6,6 @@ import time
 def data_storage_constructor():
     files = ["file_info.json", "processed_data.json", "error_data.json"]
 
-    # To create all data_storage files at once
-    directory_path = r".\main\data_storage"
     for file_name in files:
         data_path = rf".\main\data_storage\{file_name}.json"
         if not os.path.isfile(data_path):
