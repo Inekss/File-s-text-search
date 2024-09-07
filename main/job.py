@@ -1,46 +1,29 @@
 import os
 import codecs
 import chardet
-from docx import Document  # New import for handling .docx files
+from docx import Document
+
+import time
 
 
-def detect_encoding(encoding_path):
-    """Detect the encoding of the file using chardet for better accuracy."""
-    with open(encoding_path, "rb") as file:
-        raw_data = file.read(10000)  # Read a small chunk of the file
-    result = chardet.detect(raw_data)
-    encoding = result["encoding"]
-    return encoding
-
-
-def search_in_docx(search_term, path):
-    try:
-        doc = Document(path)
-        matches = []
-
-        for i, para in enumerate(doc.paragraphs):
-            if search_term.lower() in para.text.lower():
-                matches.append(f"{i + 1}: {para.text.strip()}")
-
-        if matches:
-            return "\n".join(matches)
-        else:
-            return f"No matches found for '{search_term}' in the file."
-
-    except Exception as e:
-        return f"Exception occurred: {str(e)}"
-
-
-def search_in_file(search_term, path):
-    if not os.path.isfile(path):
-        return f"Error: The file '{path}' does not exist."
-
-    if path.lower().endswith(".docx"):
-        return search_in_docx(search_term, path)
+def search_in_txt_log_json(search_term, path):
+    def detect_encoding(encoding_path):
+        with open(encoding_path, "rb") as file:
+            raw_data = file.read(10000)  # Read a small chunk of the file
+        result = chardet.detect(raw_data)
+        return result["encoding"]
 
     encoding = detect_encoding(path)
+
     if not encoding:
-        return f"Error: Unable to detect file encoding for '{path}'."
+        errors_report = {
+            "error_status": True,
+            "error_type": "encoding_error",
+            "error_message": path,
+            "error_description": "Unable TO ENCODE",
+            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        }
+        return errors_report
 
     try:
         with codecs.open(path, "r", encoding=encoding, errors="ignore") as file:
@@ -56,30 +39,92 @@ def search_in_file(search_term, path):
         if matches:
             return "\n".join(matches)
         else:
-            return f"No matches found for '{search_term}' in the file."
+            return False
 
     except Exception as e:
-        return f"Exception occurred: {str(e)}"
+        errors_report = {
+            "error_status": True,
+            "error_type": "corrupted_file",
+            "error_message": path,
+            "error_description": f"Error: corrupted file TO READ {e}",
+            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        }
+        return errors_report
+
+
+def search_in_docx(search_term, path):
+    try:
+        doc = Document(path)
+        matches = []
+
+        for i, para in enumerate(doc.paragraphs):
+            if search_term.lower() in para.text.lower():
+                matches.append(f"{i + 1}: {para.text.strip()}")
+
+        if matches:
+            return "\n".join(matches)
+        else:
+            return False
+
+    except Exception as e:
+        errors_report = {
+            "error_status": True,
+            "error_type": "corrupted_file",
+            "error_message": path,
+            "error_description": f"Error: corrupted file TO READ {e}",
+            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        }
+        return errors_report
+
+
+def reader(search_request, path):
+    if not os.path.isfile(path):
+        errors_report = {
+            "error_status": True,
+            "error_type": "file_not_found",
+            "error_message": path,
+            "error_description": "No file in directory",
+            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        }
+        return errors_report
+
+    match path.lower():
+        case path if path.endswith(".docx"):
+            output = search_in_docx(search_request, path)
+        case path if path.endswith(".txt") or path.endswith(".log") or path.endswith(
+            ".json"
+        ):
+            output = search_in_txt_log_json(search_request, path)
+        case _:
+            errors_report = {
+                "error_status": True,
+                "error_type": "file_format",
+                "error_message": path,
+                "error_description": "Unsupported file format",
+                "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            }
+            return errors_report
+
+    if not output:
+        no_result = {
+            "file_path": path,
+            "search_request": search_request,
+            "search_result": None,
+            "search_status": False,
+        }
+        return no_result
+    else:
+        result = {
+            "file_path": path,
+            "search_request": search_request,
+            "search_result": output,
+            "search_status": True,
+        }
+        return result
 
 
 if __name__ == "__main__":
-    file_path = r""
-    request = ""
-    output = search_in_file(request, file_path)
-    print(output)
-
-
-    # Debug information
-    # print("\nDebug Info:")
-    # print(f"File exists: {os.path.exists(file_path)}")
-    # print(f"File size: {os.path.getsize(file_path) if os.path.exists(file_path) else 'N/A'} bytes")
-
-    # encoding = detect_encoding(file_path)
-    # print(f"Detected encoding: {encoding}")
-
-    # try:
-    #     with codecs.open(file_path, 'r', encoding=encoding) as f:
-    #         content = f.read()
-    #         print(f"\nFile content ({encoding}):\n{content}")
-    # except Exception as e:
-    #     print(f"Error reading file: {str(e)}")
+    file_path = r"D:/PyCharm 2024.1.4/File-s-text-search/requirements.txt"
+    request = "ddddddsd"
+    find = reader(request, file_path)
+    print(find)
