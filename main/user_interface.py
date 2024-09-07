@@ -1,5 +1,6 @@
 from communication import file_picker
 import database as db
+import job as j
 
 
 def user_interface():
@@ -74,6 +75,9 @@ def user_interface():
                 print("Making search request through all database...")
             case "search-req-file" | "-s -f":
                 print("Searching in one chosen file...")
+                path = input("Enter a path of file: ")
+                request = input("Enter a search request: ")
+                result = j.reader(request, path)
             case "search-req-folder" | "-s -d":
                 print("Making search request in one chosen folder...")
             case "search-req-group" | "-s -list":
@@ -94,13 +98,19 @@ def user_interface():
         if (
             "error_type" in result
             and "error_status" in result
-            and result["error_status"] == True
+            and result.get("search_status", False)
         ):
             db.error_handling(result)
             print(result)
         elif "file_path" in result and "file_format" in result:
             db.files_properties(result)
             print(result)
+        elif "search_request" in result and "search_status" in result:
+            if result.get("search_status", True):
+                db.search_results(result)
+                print(result)
+            else:
+                print("ups")
         else:
             print(result)
 
