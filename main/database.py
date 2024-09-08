@@ -6,6 +6,7 @@ import time
 def data_storage_constructor():
     files = ["file_info.json", "processed_data.json", "error_data.json"]
 
+    r".\main\data_storage"
     for file_name in files:
         data_path = rf".\main\data_storage\{file_name}.json"
         if not os.path.isfile(data_path):
@@ -43,10 +44,16 @@ def files_properties(properties: dict):
 
         properties_path = properties.pop("file_path")
 
-        if properties_path in existing_data:
-            existing_data[properties_path].update(properties)
-        else:
+        if properties_path not in existing_data:
+            existing_data[properties_path] = {}
+
+        file_name = properties.get("file_name")
+
+        if file_name not in existing_data[properties_path]:
             existing_data[properties_path] = properties
+
+        else:
+            existing_data[properties_path][file_name] = properties
 
         with open(data_path, "w") as json_file:
             json.dump(existing_data, json_file, indent=4)
