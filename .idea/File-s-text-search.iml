@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 (File-s-text-search)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12 (FTS_git)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
