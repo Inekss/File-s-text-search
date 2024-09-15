@@ -2,7 +2,8 @@
 import os
 
 def clean_cache():
-    for root, dirs, files in os.walk('../cache_cleaner'):
+    target_dir = 'main/__pycache__'
+    for root, dirs, files in os.walk(target_dir):
         for dir in dirs:
             if dir == '__pycache__':
                 cache_dir = os.path.join(root, dir)
