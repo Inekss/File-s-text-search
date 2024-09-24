@@ -1,6 +1,10 @@
+import atexit
+from main import cache_c
+
 from communication import file_picker
 import database as db
 import job as j
+
 
 
 def user_interface():
@@ -118,3 +122,6 @@ def user_interface():
 if __name__ == "__main__":
     print("To see all commands, type 'help'.")
     user_interface()
+
+
+atexit.register(cache_c.clean_cache)
