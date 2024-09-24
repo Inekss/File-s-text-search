@@ -102,7 +102,7 @@ def user_interface():
         if (
             "error_type" in result
             and "error_status" in result
-            and result.get("search_status", False)
+            and result.get("search_status", True)
         ):
             db.error_handling(result)
             print(result)
