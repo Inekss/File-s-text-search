@@ -1,14 +1,13 @@
 import atexit
-from main import cache_c
-
+import cleaner
 from communication import file_picker
-import database as db
+from local_logger.logger import Logger as Logger
 import job as j
 
+logger = Logger()
 
 
-def user_interface():
-    result = ""
+def client():
     commands_list = [
         "help",
         "-h",
@@ -51,6 +50,7 @@ def user_interface():
     ]
     while True:
         console_user_command = input("Enter a command: ")
+        result = {}
         match console_user_command:
             case "help" | "-h":
                 for command in commands_list:
@@ -104,14 +104,14 @@ def user_interface():
             and "error_status" in result
             and result.get("search_status", True)
         ):
-            db.error_handling(result)
+            Logger.error_handling(logger, result)
             print(result)
         elif "file_path" in result and "file_format" in result:
-            db.files_properties(result)
+            Logger.files_properties(logger, result)
             print(result)
         elif "search_request" in result and "search_status" in result:
             if result.get("search_status", True):
-                db.search_results(result)
+                Logger.search_results(logger, result)
                 print(result)
             else:
                 print("ups")
@@ -121,7 +121,5 @@ def user_interface():
 
 if __name__ == "__main__":
     print("To see all commands, type 'help'.")
-    user_interface()
-
-
-atexit.register(cache_c.clean_cache)
+    client()
+    atexit.register(cleaner.clean_cache)
