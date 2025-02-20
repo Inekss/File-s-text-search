@@ -13,7 +13,7 @@ class SaveJsonException(Exception):
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             }
         }
-        error_handling(logger, dict_message)\
+        error_handling(logger, dict_message)
 
     def error_handling(self, message: dict) -> bool:
         """Logs errors into 'error_data.json'."""
@@ -23,7 +23,7 @@ class SaveJsonException(Exception):
         try:
             existing_data = Man.load_data_storage_file(man, data_path)
         except Exception:
-            return False # have rights to have no handling
+            return False  # have rights to have no handling
 
         if not isinstance(existing_data, dict):
             existing_data = {"errors": []}
@@ -34,5 +34,5 @@ class SaveJsonException(Exception):
         try:
             Man.save_data_storage_file(man, data_path, existing_data)
         except Exception:
-            return False # have rights to have no handling
+            return False  # have rights to have no handling
         return True

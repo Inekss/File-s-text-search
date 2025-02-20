@@ -23,7 +23,7 @@ class RequiredKeysException(Exception):
         try:
             existing_data = Man.load_data_storage_file(man, data_path)
         except Exception:
-            return False # have rights to have no handling
+            return False  # have rights to have no handling
 
         if not isinstance(existing_data, dict):
             existing_data = {"errors": []}
@@ -34,5 +34,5 @@ class RequiredKeysException(Exception):
         try:
             Man.save_data_storage_file(man, data_path, existing_data)
         except Exception:
-            return False # have rights to have no handling
+            return False  # have rights to have no handling
         return True
