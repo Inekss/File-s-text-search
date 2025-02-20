@@ -19,7 +19,9 @@ def client():
         "quit",
         "-q",
         "show-history",
-        "-ch",
+        "-sh",
+        "show-error-history",
+        "-seh",
         "add-file",
         "-a -f",
         "add-folder",
@@ -53,22 +55,32 @@ def client():
         "show-all",
         "-t -all",
     ]
+    command_history = []
     while True:
+        print()
         console_user_command = input("Enter a command: ")
+        command_history.append(console_user_command)
         result = {}
         success = False
         match console_user_command:
             case "help" | "-h":
                 for command in commands_list:
                     print(command)
+                continue
             case "quit" | "-q":
                 print("Terminating app...")
                 break
-            case "show-history" | "-ch":
+            case "show-history" | "-sh":
                 print("Showing command history...")
+                for i in command_history:
+                    print(i)
+                continue
+            case "show-error-history" | "-seh":
+                success = False
             case "add-file" | "-a -f":
                 print("Adding file manually...")
                 result = file_picker()
+                success = Logger.files_properties(logger, result)
             case "add-folder" | "-a -d":
                 print("Adding folder manually...")
             case "add-file-path" | "-a -f -p":
@@ -88,6 +100,7 @@ def client():
                 path = input("Enter a path of file: ")
                 request = input("Enter a search request: ")
                 result = j.reader(request, path)
+                success = Logger.search_results(logger, result)
             case "search-req-folder" | "-s -d":
                 print("Making search request in one chosen folder...")
             case "search-req-group" | "-s -list":
@@ -105,24 +118,14 @@ def client():
             case _:
                 print("Unknown command. Type 'help' or '-h' for a list of commands.")
 
-        if not result:
+        if not result or not success:
             data_folder = "data_storage"
             data_path = os.path.join(data_folder, r"error_data.json")
-            success = stManager.load_data_storage_file(man, data_path)
-        elif "file_path" in result and "file_format" in result:
-            success = Logger.files_properties(logger, result)
-        elif "search_request" in result and "search_status" in result:
-            if result.get("search_status", True):
-                success = Logger.search_results(logger, result)
-            else:
-                print("ups")
+            issues = stManager.load_data_storage_file(man, data_path)
+            print(issues)
+            continue
 
-        if not success:
-            data_folder = "data_storage"
-            data_path = os.path.join(data_folder, r"error_data.json")
-            stManager.load_data_storage_file(man, data_path)
-        else:
-            print(result)
+        print(result)
 
 
 if __name__ == "__main__":
