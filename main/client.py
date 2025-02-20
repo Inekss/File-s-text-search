@@ -2,14 +2,14 @@ import atexit
 import os
 
 import job as j
-from file_manager.manager_impl import ManagerImpl as Man
+from file_manager.storage_manager_impl import StorageManagerImpl as stManager
 from local_logger.custom_logger import CustomLogger as Logger
 
 from main.cleaner import clean_cache
 from main.communication import file_picker
 
 logger = Logger()
-man = Man()
+man = stManager()
 
 
 def client():
@@ -108,7 +108,7 @@ def client():
         if not result:
             data_folder = "data_storage"
             data_path = os.path.join(data_folder, r"error_data.json")
-            success = Man.load_data_storage_file(man, data_path)
+            success = stManager.load_data_storage_file(man, data_path)
         elif "file_path" in result and "file_format" in result:
             success = Logger.files_properties(logger, result)
         elif "search_request" in result and "search_status" in result:
@@ -120,7 +120,7 @@ def client():
         if not success:
             data_folder = "data_storage"
             data_path = os.path.join(data_folder, r"error_data.json")
-            Man.load_data_storage_file(man, data_path)
+            stManager.load_data_storage_file(man, data_path)
         else:
             print(result)
 
