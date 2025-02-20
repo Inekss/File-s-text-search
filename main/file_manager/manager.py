@@ -1,0 +1,16 @@
+from abc import abstractmethod
+
+
+class FileManager:
+
+    @abstractmethod
+    def data_storage_exists(self) -> bool:
+        pass
+
+    @abstractmethod
+    def load_data_storage_file(self, file_path: str) -> dict:
+        pass
+
+    @abstractmethod
+    def save_data_storage_file(self, file_path: str, data: dict):
+        pass

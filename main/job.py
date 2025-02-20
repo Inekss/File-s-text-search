@@ -1,10 +1,10 @@
-import os
 import codecs
-import chardet
-from docx import Document
+import os
+import time
 from typing import Any
 
-import time
+import chardet
+from docx import Document
 
 
 def search_in_txt_log_json(search_term, path: str) -> Any:

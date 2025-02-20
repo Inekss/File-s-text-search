@@ -1,10 +1,15 @@
 import atexit
-import cleaner
-from communication import file_picker
-from local_logger.custom_logger import CustomLogger as Logger
+import os
+
 import job as j
+from file_manager.manager_impl import ManagerImpl as Man
+from local_logger.custom_logger import CustomLogger as Logger
+
+from main.cleaner import clean_cache
+from main.communication import file_picker
 
 logger = Logger()
+man = Man()
 
 
 def client():
@@ -51,6 +56,7 @@ def client():
     while True:
         console_user_command = input("Enter a command: ")
         result = {}
+        success = False
         match console_user_command:
             case "help" | "-h":
                 for command in commands_list:
@@ -99,22 +105,22 @@ def client():
             case _:
                 print("Unknown command. Type 'help' or '-h' for a list of commands.")
 
-        if (
-            "error_type" in result
-            and "error_status" in result
-            and result.get("search_status", True)
-        ):
-            Logger.error_handling(logger, result)
-            print(result)
+        if not result:
+            data_folder = "data_storage"
+            data_path = os.path.join(data_folder, r"error_data.json")
+            success = Man.load_data_storage_file(man, data_path)
         elif "file_path" in result and "file_format" in result:
-            Logger.files_properties(logger, result)
-            print(result)
+            success = Logger.files_properties(logger, result)
         elif "search_request" in result and "search_status" in result:
             if result.get("search_status", True):
-                Logger.search_results(logger, result)
-                print(result)
+                success = Logger.search_results(logger, result)
             else:
                 print("ups")
+
+        if not success:
+            data_folder = "data_storage"
+            data_path = os.path.join(data_folder, r"error_data.json")
+            Man.load_data_storage_file(man, data_path)
         else:
             print(result)
 
@@ -122,4 +128,4 @@ def client():
 if __name__ == "__main__":
     print("To see all commands, type 'help'.")
     client()
-    atexit.register(cleaner.clean_cache)
+    atexit.register(clean_cache)
