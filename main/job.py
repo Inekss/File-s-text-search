@@ -2,11 +2,12 @@ import os
 import codecs
 import chardet
 from docx import Document
+from typing import Any
 
 import time
 
 
-def search_in_txt_log_json(search_term, path):
+def search_in_txt_log_json(search_term, path: str) -> Any:
     def detect_encoding(encoding_path):
         with open(encoding_path, "rb") as file:
             raw_data = file.read(10000)  # Read a small chunk of the file
@@ -52,7 +53,7 @@ def search_in_txt_log_json(search_term, path):
         return errors_report
 
 
-def search_in_docx(search_term, path):
+def search_in_docx(search_term, path: str) -> Any:
     try:
         doc = Document(path)
         matches = []
@@ -77,7 +78,7 @@ def search_in_docx(search_term, path):
         return errors_report
 
 
-def reader(search_request, path):
+def reader(search_request, path: str) -> dict:
     if not os.path.isfile(path):
         errors_report = {
             "error_status": True,
@@ -124,7 +125,7 @@ def reader(search_request, path):
 
 
 if __name__ == "__main__":
-    file_path = r"D:/PyCharm 2024.1.4/File-s-text-search/requirements.txt"
-    request = "ddddddsd"
+    file_path = r"requirements.txt"
+    request = "black"
     find = reader(request, file_path)
     print(find)
