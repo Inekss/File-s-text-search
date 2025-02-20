@@ -1,0 +1,21 @@
+from main.local_logger.custom_logger import CustomLogger as Logger
+
+logger = Logger()
+
+
+class RequiredKeysException(Exception):
+    """Custom exception for file properties validation errors."""
+
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
+        dict_message = {
+            "error": {
+                "error_status": True,
+                "error_type": "incorrect_parameters",
+                "error_message": "parameters",
+                "error_description": message,
+                "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            }
+        }
+        Logger.error_handling(logger, dict_message)

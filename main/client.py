@@ -1,7 +1,7 @@
 import atexit
 import cleaner
 from communication import file_picker
-from local_logger.logger import Logger as Logger
+from local_logger.custom_logger import CustomLogger as Logger
 import job as j
 
 logger = Logger()
