@@ -1,4 +1,4 @@
-class RequiredKeysException(Exception):
+class InvalidJsonException(Exception):
     """Custom exception for file properties validation errors."""
 
     def __init__(self, message: str):
@@ -7,8 +7,8 @@ class RequiredKeysException(Exception):
         dict_message = {
             "error": {
                 "error_status": True,
-                "error_type": "incorrect_parameters",
-                "error_message": "parameters",
+                "error_type": "contains invalid JSON",
+                "error_message": "broken JSON",
                 "error_description": message,
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             }
