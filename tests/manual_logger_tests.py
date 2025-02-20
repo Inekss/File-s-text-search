@@ -6,7 +6,7 @@ import pytest
 # Add project root to PYTHONPATH
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from main.local_logger.logger import Logger
+from main.local_logger.custom_logger import Logger
 
 # Ensure tests use the correct data storage directory
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
