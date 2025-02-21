@@ -1,10 +1,16 @@
 import os
-import time
 import tkinter as tk
 from tkinter import filedialog
 
+from main.local_logger.custom_exceptions.file_not_exist_exception import (
+    FileNotExistException,
+)
+from main.local_logger.custom_exceptions.picker_file_corrupted_exception import (
+    PickerFileCorruptedException,
+)
 
-def file_picker():
+
+def file_picker() -> dict:
     root = tk.Tk()
     root.withdraw()  # Hide the main window
     root.deiconify()  # Make the root window appear
@@ -21,15 +27,14 @@ def file_picker():
             file_name = os.path.basename(file_path)
             file_size = os.path.getsize(file_path)
             file_format = os.path.splitext(file_name)[1]
-        except Exception as e:
-            errors_report = {
-                "error_status": True,
-                "error_type": "corrupted_file",
-                "error_message": file_path,
-                "error_description": f"Error: corrupted file TO PEAK {e}",
-                "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-            }
-            return errors_report
+        except Exception:
+            try:
+                raise PickerFileCorruptedException(
+                    "Issue appeared while trying to get file properties"
+                )
+            except PickerFileCorruptedException:
+                return {}
+
         else:
             file_properties = {
                 "file_path": file_path,
@@ -39,14 +44,10 @@ def file_picker():
             }
             return file_properties
     else:
-        errors_report = {
-            "error_status": True,
-            "error_type": "file_picker",
-            "error_message": "file not found",
-            "error_description": "unable to choose a file using file picker",
-            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-        }
-        return errors_report
+        try:
+            raise FileNotExistException("unable to choose a file using file picker")
+        except FileNotExistException:
+            return {}
 
 
 if __name__ == "__main__":

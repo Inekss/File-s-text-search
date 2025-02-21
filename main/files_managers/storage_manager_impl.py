@@ -1,7 +1,7 @@
 import json
 import os
 
-from main.file_manager.storage_manager import StorageFileManager
+from main.files_managers.storage_manager import StorageFileManager
 from main.local_logger.custom_exceptions.file_not_exist_exception import (
     FileNotExistException,
 )
@@ -64,3 +64,24 @@ class StorageManagerImpl(StorageFileManager):
                 print(f"❌ Failed to write data to {file_path}: {e}")
                 raise SaveJsonException(f"❌ Failed to write data to {file_path}: {e}")
         return False
+
+    def show_error_storage(self):
+        data_folder = "data_storage"
+        data_path = os.path.join(data_folder, r"error_data.json")
+        issues = self.load_data_storage_file(data_path)
+        for issue in issues.get("\033[94mErrors:\033[0m", []):  # Blue color for header
+            error_details = issue.get("error", {})
+            print(f"\033[91m{error_details}\033[0m")
+
+    def show_processed_data_storage(self):
+        data_folder = "data_storage"
+        data_path = os.path.join(data_folder, r"processed_data.json")
+        processed_data = self.load_data_storage_file(data_path)
+        print(json.dumps(processed_data, indent=4))
+
+    def show_file_info_data_storage(self):
+        data_folder = "data_storage"
+        data_path = os.path.join(data_folder, r"file_info.json")
+        files = self.load_data_storage_file(data_path)
+        print("\033[94mFile Structure:\033[0m")  # Blue color for header
+        print(json.dumps(files, indent=4))

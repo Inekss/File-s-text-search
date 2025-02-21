@@ -14,8 +14,8 @@ class InvalidJsonException(Exception):
         dict_message = {
             "error": {
                 "error_status": True,
-                "error_type": "contains invalid JSON",
-                "error_message": "broken JSON",
+                "error_type": "invalid_JSON",
+                "error_message": "contains broken JSON",
                 "error_description": message,
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             }

@@ -1,59 +1,65 @@
 import atexit
 import os
 
-import job as j
-from file_manager.storage_manager_impl import StorageManagerImpl as stManager
+import job
+from files_managers.storage_manager_impl import StorageManagerImpl as stManager
 
-from main.analyzer.utils import files_properties, search_results
+from main.analyzer.util import search_results
 from main.cleaner import clean_cache
-from main.communication import file_picker
+from main.files_managers.picker.picker import file_picker
+from main.files_managers.picker.util import (
+    construct_files_properties as files_properties,
+)
 
 man = stManager()
 
+commands_list = [
+    "help",
+    "-h",
+    "quit",
+    "-q",
+    "show-history",
+    "-sh",
+    "show-error-history",
+    "-seh",
+    "add-file",
+    "-a -f",
+    "add-folder",
+    "-a -d",
+    "add-file-path",
+    "-a -f -p",
+    "add-folder-path",
+    "-a -d -p",
+    "clear-database",
+    "-rm -c",
+    "remove-file",
+    "-rm -f",
+    "remove-folder",
+    "-rm -d",
+    "search-req-all",
+    "-s -all",
+    "search-req-file",
+    "-s -f",
+    "search-req-folder",
+    "-s -d",
+    "search-req-group",
+    "-s -list",
+    "search-req-multiple",
+    "-s -multi",
+    "show-files",
+    "-t -f",
+    "show-data",
+    "-t -d",
+    "show-errors",
+    "-t -e",
+    "show-all",
+    "-t -all",
+    "pycache-clean",
+    "-clean",
+]
+
 
 def client():
-    commands_list = [
-        "help",
-        "-h",
-        "quit",
-        "-q",
-        "show-history",
-        "-sh",
-        "show-error-history",
-        "-seh",
-        "add-file",
-        "-a -f",
-        "add-folder",
-        "-a -d",
-        "add-file-path",
-        "-a -f -p",
-        "add-folder-path",
-        "-a -d -p",
-        "clear-database",
-        "-rm -c",
-        "remove-file",
-        "-rm -f",
-        "remove-folder",
-        "-rm -d",
-        "search-req-all",
-        "-s -all",
-        "search-req-file",
-        "-s -f",
-        "search-req-folder",
-        "-s -d",
-        "search-req-group",
-        "-s -list",
-        "search-req-multiple",
-        "-s -multi",
-        "show-files",
-        "-t -f",
-        "show-data",
-        "-t -i",
-        "show-errors",
-        "-t -e",
-        "show-all",
-        "-t -all",
-    ]
     command_history = []
     while True:
         print()
@@ -98,7 +104,7 @@ def client():
                 print("Searching in one chosen file...")
                 path = input("Enter a path of file: ")
                 request = input("Enter a search request: ")
-                result = j.reader(request, path)
+                result = job.simple_search_client(request, path)
                 success = search_results(result)
             case "search-req-folder" | "-s -d":
                 print("Making search request in one chosen folder...")
@@ -107,23 +113,27 @@ def client():
             case "search-req-multiple" | "-s -multi":
                 print("Making multiple search requests...")
             case "show-files" | "-t -f":
-                print("Reviewing file database...")
-            case "show-data" | "-t -i":
-                print("Reviewing data database...")
+                print("Reviewing file storage...")
+                stManager.show_file_info_data_storage(man)
+            case "show-data" | "-t -d":
+                print("Reviewing processed data storage...")
+                stManager.show_processed_data_storage(man)
             case "show-errors" | "-t -e":
-                print("Reviewing error database...")
+                print("Reviewing error storage...")
+                stManager.show_error_storage(man)
             case "show-all" | "-t -all":
-                print("Reviewing all databases...")
+                print("Reviewing all storages...")
+
+            case "pycache-clean" | "-clean":
+                print("Cleaning cache...")
+                atexit.register(clean_cache)
+                continue
             case _:
                 print("Unknown command. Type 'help' or '-h' for a list of commands.")
+                continue
 
         if not result or not success:
-            data_folder = "data_storage"
-            data_path = os.path.join(data_folder, r"error_data.json")
-            issues = stManager.load_data_storage_file(man, data_path)
-            for issue in issues.get("errors", []):
-                error_details = issue.get("error", {})
-                print(f"\033[91m{error_details}\033[0m")
+            stManager.show_error_storage(man)
             continue
 
         print(result)
@@ -132,4 +142,3 @@ def client():
 if __name__ == "__main__":
     print("To see all commands, type 'help'.")
     client()
-    atexit.register(clean_cache)
