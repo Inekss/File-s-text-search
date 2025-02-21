@@ -20,7 +20,7 @@ def construct_files_properties(properties) -> bool:
 
     data_path = os.path.join(data_folder, r"file_info.json")
     try:
-        existing_data = Man.load_data_storage_file(man, data_path)
+        existing_data = Man.load_data_from_storage(man, data_path)
     except Exception:
         return False
 
@@ -32,7 +32,7 @@ def construct_files_properties(properties) -> bool:
         existing_data[file_path] = properties
 
     try:
-        success = Man.save_data_to_storage_file(man, data_path, existing_data)
+        success = Man.save_data_to_storage(man, data_path, existing_data)
     except Exception:
         return False
     return success
