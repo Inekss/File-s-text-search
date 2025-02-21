@@ -3,12 +3,11 @@ import os
 
 import job as j
 from file_manager.storage_manager_impl import StorageManagerImpl as stManager
-from local_logger.custom_logger import CustomLogger as Logger
 
+from main.analyzer.utils import files_properties, search_results
 from main.cleaner import clean_cache
 from main.communication import file_picker
 
-logger = Logger()
 man = stManager()
 
 
@@ -80,7 +79,7 @@ def client():
             case "add-file" | "-a -f":
                 print("Adding file manually...")
                 result = file_picker()
-                success = Logger.files_properties(logger, result)
+                success = files_properties(result)
             case "add-folder" | "-a -d":
                 print("Adding folder manually...")
             case "add-file-path" | "-a -f -p":
@@ -100,7 +99,7 @@ def client():
                 path = input("Enter a path of file: ")
                 request = input("Enter a search request: ")
                 result = j.reader(request, path)
-                success = Logger.search_results(logger, result)
+                success = search_results(result)
             case "search-req-folder" | "-s -d":
                 print("Making search request in one chosen folder...")
             case "search-req-group" | "-s -list":
@@ -122,7 +121,9 @@ def client():
             data_folder = "data_storage"
             data_path = os.path.join(data_folder, r"error_data.json")
             issues = stManager.load_data_storage_file(man, data_path)
-            print(issues)
+            for issue in issues.get("errors", []):
+                error_details = issue.get("error", {})
+                print(f"\033[91m{error_details}\033[0m")
             continue
 
         print(result)

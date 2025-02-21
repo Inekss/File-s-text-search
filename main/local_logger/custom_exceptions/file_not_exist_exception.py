@@ -1,3 +1,10 @@
+import time
+
+from main.local_logger.custom_logger import CustomLogger
+
+logger = CustomLogger()
+
+
 class FileNotExistException(Exception):
     """Custom exception for file properties validation errors."""
 
@@ -13,26 +20,4 @@ class FileNotExistException(Exception):
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             }
         }
-        error_handling(logger, dict_message)
-
-    def error_handling(self, message: dict) -> bool:
-        """Logs errors into 'error_data.json'."""
-        data_folder = r"data_storage"
-
-        data_path = os.path.join(data_folder, "error_data.json")
-        try:
-            existing_data = Man.load_data_storage_file(man, data_path)
-        except Exception:
-            return False  # have rights to have no handling
-
-        if not isinstance(existing_data, dict):
-            existing_data = {"errors": []}
-        elif "errors" not in existing_data:
-            existing_data["errors"] = []
-
-        existing_data["errors"].append(message)
-        try:
-            Man.save_data_storage_file(man, data_path, existing_data)
-        except Exception:
-            return False  # have rights to have no handling
-        return True
+        CustomLogger.error_handling(logger, dict_message)

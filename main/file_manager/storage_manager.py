@@ -4,7 +4,7 @@ from abc import abstractmethod
 class StorageFileManager:
 
     @abstractmethod
-    def data_storage_exists(self) -> bool:
+    def data_storage_exists(self, file_path) -> bool:
         pass
 
     @abstractmethod
