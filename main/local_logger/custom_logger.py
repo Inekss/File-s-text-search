@@ -1,77 +1,75 @@
+import json
 import os
-
-from main.file_manager.storage_manager_impl import StorageManagerImpl as Man
-from main.local_logger.custom_exceptions.invalid_json_exception import \
-    InvalidJsonException
-from main.local_logger.custom_exceptions.save_json_exception import \
-    SaveJsonException
-
-man = Man()
 
 
 class CustomLogger:
-
-    def files_properties(self, properties) -> bool:
-        from main.local_logger.custom_exceptions.required_keys_exception import \
-            RequiredKeysException
-
-        """Stores file metadata into 'file_info.json'."""
+    def error_storage_exists(self) -> bool:
+        """Ensure the JSON file exists without recreating it unnecessarily."""
         data_folder = r"data_storage"
-        required_keys = {"file_path", "file_name", "file_size", "file_format"}
-        if not required_keys.issubset(properties):
+        file_path = os.path.join(data_folder, r"error_data.json")
+
+        if not os.path.isfile(file_path):
             try:
-                raise RequiredKeysException(
-                    "file_path, file_name, file_size, file_format"
-                )
-            except RequiredKeysException:
+                with open(file_path, "w") as json_file:
+                    json.dump({}, json_file)
+                return False
+            except Exception as e:
                 return False
 
-        data_path = os.path.join(data_folder, r"file_info.json")
-
-        try:
-            existing_data = Man.load_data_storage_file(man, data_path)
-        except Exception:
-            raise InvalidJsonException(
-                f" {data_path} contains invalid JSON. Resetting..."
-            )
-
-        file_path = properties.pop("file_path")
-
-        if file_path in existing_data:
-            existing_data[file_path].update(properties)
-        else:
-            existing_data[file_path] = properties
-
-        try:
-            Man.save_data_storage_file(man, data_path, existing_data)
-        except Exception as e:
-            raise SaveJsonException(f"❌ Failed to write data to {file_path}: {e}")
         return True
 
-    def search_results(self, processed_data: dict) -> dict:
-        """Stores search results into 'processed_data.json'."""
+    def load_error_storage(self, file_path) -> dict:
+        """Load JSON data without error handling, ensuring storage is initialized first."""
+
+        if self.error_storage_exists():
+            try:
+                with open(file_path, "r") as json_file:
+                    content = json_file.read().strip()
+
+                    if not content:
+                        raise Exception
+
+                    data = json.loads(content)
+                    return data
+
+            except Exception:
+                with open(file_path, "w") as json_file:
+                    json.dump({}, json_file)
+                # Have rights to be not caught
+        return {}
+
+    def save_error_storage(self, file_path, data) -> bool:
+        """Save JSON data and force flush to disk."""
+        if self.error_storage_exists():
+            try:
+                with open(file_path, "w") as json_file:
+                    json.dump(data, json_file, indent=4)
+                    json_file.flush()
+                    os.fsync(json_file.fileno())
+                return True
+            except Exception:
+                return False
+                # Have rights to be not caught
+        return False
+
+    def error_handling(self, message: dict) -> bool:
+        """Logs errors into 'error_data.json'."""
         data_folder = r"data_storage"
-        data_path = os.path.join(data_folder, "processed_data.json")
+
+        data_path = os.path.join(data_folder, "error_data.json")
         try:
-            existing_data = Man.load_data_storage_file(man, data_path)
+            existing_data = self.load_error_storage(data_path)
         except Exception:
-            raise InvalidJsonException(
-                f" {data_path} contains invalid JSON. Resetting..."
-            )
+            return False  # have rights to have no handling
 
-        file_path = processed_data.pop("file_path")
+        if not isinstance(existing_data, dict):
+            existing_data = {"errors": []}
+        elif "errors" not in existing_data:
+            existing_data["errors"] = []
 
-        if file_path not in existing_data:
-            existing_data[file_path] = {}
-
-        if "search_request" in processed_data:
-            search_key = processed_data["search_request"]
-            if search_key not in existing_data[file_path]:
-                existing_data[file_path][search_key] = []
-            existing_data[file_path][search_key].extend(processed_data["search_result"])
-
+        existing_data["errors"].append(message)
         try:
-            Man.save_data_storage_file(man, data_path, existing_data)
-        except Exception as e:
-            raise SaveJsonException(f"❌ Failed to write data to {file_path}: {e}")
-        return {"status": "success", "message": "Search results logged successfully"}
+            self.save_error_storage(data_path, existing_data)
+        except Exception:
+            return False  # have rights to have no handling
+        return True
