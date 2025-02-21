@@ -21,7 +21,7 @@ def save_simple_search_results(processed_data: dict) -> bool:
     data_folder = r"data_storage"
     data_path = os.path.join(data_folder, "processed_data.json")
     try:
-        existing_data = Man.load_data_from_storage_file(man, data_path)
+        existing_data = Man.load_data_from_storage(man, data_path)
     except Exception:
         return False
 
@@ -37,7 +37,7 @@ def save_simple_search_results(processed_data: dict) -> bool:
         existing_data[file_path][search_key].extend(processed_data["search_result"])
 
     try:
-        Man.save_data_to_storage_file(man, data_path, existing_data)
+        Man.save_data_to_storage(man, data_path, existing_data)
     except Exception:
         return False
     return True

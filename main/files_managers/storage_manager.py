@@ -8,11 +8,11 @@ class StorageFileManager:
         pass
 
     @abstractmethod
-    def load_data_from_storage_file(self, file_path: str) -> dict:
+    def load_data_from_storage(self, file_path: str) -> dict:
         pass
 
     @abstractmethod
-    def save_data_to_storage_file(self, file_path: str, data: dict) -> bool:
+    def save_data_to_storage(self, file_path: str, data: dict) -> bool:
         pass
 
     @abstractmethod

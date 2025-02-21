@@ -27,7 +27,7 @@ class StorageManagerImpl(StorageFileManager):
 
         return True
 
-    def load_data_from_storage_file(self, file_path: str) -> dict:
+    def load_data_from_storage(self, file_path: str) -> dict:
         """Load JSON data with error handling, ensuring storage is initialized first."""
 
         if self.data_storage_exists(file_path):
@@ -50,7 +50,7 @@ class StorageManagerImpl(StorageFileManager):
                 )
         return {}
 
-    def save_data_to_storage_file(self, file_path: str, data: dict) -> bool:
+    def save_data_to_storage(self, file_path: str, data: dict) -> bool:
         """Save JSON data and force flush to disk."""
         if self.data_storage_exists(file_path):
             try:
@@ -71,7 +71,7 @@ class StorageManagerImpl(StorageFileManager):
         if not self.data_storage_exists(data_path):
             return False
 
-        issues = self.load_data_from_storage_file(data_path)
+        issues = self.load_data_from_storage(data_path)
 
         print("\033[94mErrors:\033[0m")  # Blue color for header
         for issue in issues.get("errors", []):
@@ -85,7 +85,7 @@ class StorageManagerImpl(StorageFileManager):
         if not self.data_storage_exists(data_path):
             return False
 
-        processed_data = self.load_data_from_storage_file(data_path)
+        processed_data = self.load_data_from_storage(data_path)
 
         print("\033[94mProcessed Data:\033[0m")  # Blue header
         for file_path, matches in processed_data.items():
@@ -109,7 +109,7 @@ class StorageManagerImpl(StorageFileManager):
         if not self.data_storage_exists(data_path):
             return False
 
-        files = self.load_data_from_storage_file(data_path)
+        files = self.load_data_from_storage(data_path)
 
         print("\033[94mFile Structure:\033[0m")  # Blue color for header
         for file_path, file_details in files.items():
