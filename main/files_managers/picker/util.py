@@ -32,7 +32,7 @@ def construct_files_properties(properties) -> bool:
         existing_data[file_path] = properties
 
     try:
-        success = Man.save_data_storage_file(man, data_path, existing_data)
+        success = Man.save_data_to_storage_file(man, data_path, existing_data)
     except Exception:
         return False
     return success
