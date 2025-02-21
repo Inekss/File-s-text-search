@@ -27,7 +27,7 @@ class StorageManagerImpl(StorageFileManager):
 
         return True
 
-    def load_data_storage_file(self, file_path: str) -> dict:
+    def load_data_from_storage_file(self, file_path: str) -> dict:
         """Load JSON data with error handling, ensuring storage is initialized first."""
 
         if self.data_storage_exists(file_path):
@@ -50,7 +50,7 @@ class StorageManagerImpl(StorageFileManager):
                 )
         return {}
 
-    def save_data_storage_file(self, file_path, data) -> bool:
+    def save_data_to_storage_file(self, file_path: str, data: dict) -> bool:
         """Save JSON data and force flush to disk."""
         if self.data_storage_exists(file_path):
             try:
@@ -65,23 +65,68 @@ class StorageManagerImpl(StorageFileManager):
                 raise SaveJsonException(f"❌ Failed to write data to {file_path}: {e}")
         return False
 
-    def show_error_storage(self):
+    def show_error_storage(self) -> bool:
         data_folder = "data_storage"
         data_path = os.path.join(data_folder, r"error_data.json")
-        issues = self.load_data_storage_file(data_path)
-        for issue in issues.get("\033[94mErrors:\033[0m", []):  # Blue color for header
-            error_details = issue.get("error", {})
-            print(f"\033[91m{error_details}\033[0m")
+        if not self.data_storage_exists(data_path):
+            return False
 
-    def show_processed_data_storage(self):
+        issues = self.load_data_from_storage_file(data_path)
+
+        print("\033[94mErrors:\033[0m")  # Blue color for header
+        for issue in issues.get("errors", []):
+            error_details = issue.get("error", {})
+            print(f"\033[91m{error_details}\033[0m")  # Red color for error
+        return True
+
+    def show_processed_data_storage(self) -> bool:
         data_folder = "data_storage"
         data_path = os.path.join(data_folder, r"processed_data.json")
-        processed_data = self.load_data_storage_file(data_path)
-        print(json.dumps(processed_data, indent=4))
+        if not self.data_storage_exists(data_path):
+            return False
 
-    def show_file_info_data_storage(self):
+        processed_data = self.load_data_from_storage_file(data_path)
+
+        print("\033[94mProcessed Data:\033[0m")  # Blue header
+        for file_path, matches in processed_data.items():
+            print(f"\033[92mFile:\033[0m {file_path}")  # Green for file path
+            for (
+                search_term,
+                occurrences,
+            ) in matches.items():  # Iterate dynamically over search terms
+                print(
+                    f"  \033[93mSearch Term:\033[0m {search_term}"
+                )  # Yellow for dynamic term
+                for match in occurrences:
+                    print(
+                        f"    \033[96mMatch:\033[0m {match}"
+                    )  # Cyan for match details
+        return True
+
+    def show_file_info_data_storage(self) -> bool:
         data_folder = "data_storage"
         data_path = os.path.join(data_folder, r"file_info.json")
-        files = self.load_data_storage_file(data_path)
+        if not self.data_storage_exists(data_path):
+            return False
+
+        files = self.load_data_from_storage_file(data_path)
+
         print("\033[94mFile Structure:\033[0m")  # Blue color for header
-        print(json.dumps(files, indent=4))
+        for file_path, file_details in files.items():
+            print(f"\033[92mFile Path:\033[0m {file_path}")  # Green for path
+            for key, value in file_details.items():
+                print(f"  \033[96m{key}:\033[0m {value}")  # Cyan for key-value pairs
+        return True
+
+    def show_all_data_storage(self) -> bool:
+        print()
+        if not self.show_file_info_data_storage():
+            return False
+        print()
+        if not self.show_processed_data_storage():
+            return False
+        print()
+        if not self.show_error_storage():
+            return False
+        print()
+        return True

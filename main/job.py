@@ -1,11 +1,7 @@
-import codecs
-import time
-from typing import Any
-
-import chardet
-from docx import Document
-
 from main.files_managers.file_manager_impl import FileManagerImpl as FileManager
+from main.local_logger.custom_exceptions.invalid_input_exception import (
+    InvalidInputException,
+)
 from main.local_logger.custom_exceptions.unsupported_format_exception import (
     UnsupportedFormatException,
 )
@@ -13,38 +9,18 @@ from main.local_logger.custom_exceptions.unsupported_format_exception import (
 fman = FileManager()
 
 
-def search_in_docx(search_term, path: str) -> Any:
-    try:
-        doc = Document(path)
-        matches = []
-
-        for i, para in enumerate(doc.paragraphs):
-            if search_term.lower() in para.text.lower():
-                matches.append(f"{i + 1}: {para.text.strip()}")
-
-        if matches:
-            return "\n".join(matches)
-        else:
-            return False
-
-    except Exception as e:
-        errors_report = {
-            "error_status": True,
-            "error_type": "corrupted_file",
-            "error_message": path,
-            "error_description": f"Error: corrupted file TO READ {e}",
-            "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-        }
-        return errors_report
-
-
-def simple_search_client(search_request, path: str) -> dict:
-    if not FileManager.file_exist(fman, path):
-        return {}
+def simple_search_client(search_request: str, path: str) -> dict:
+    if not FileManager.file_exist(fman, path) or path == "" or search_request == "":
+        try:
+            raise InvalidInputException(
+                "simple_search_client return False while input validation"
+            )
+        except InvalidInputException:
+            return {}
 
     match path.lower():
         case path if path.endswith(".docx"):
-            output = search_in_docx(search_request, path)
+            output = FileManager.simple_search_in_docx(fman, search_request, path)
         case path if path.endswith(".txt") or path.endswith(".log") or path.endswith(
             ".json"
         ):

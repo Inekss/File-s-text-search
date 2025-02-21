@@ -1,10 +1,9 @@
 import atexit
-import os
 
 import job
 from files_managers.storage_manager_impl import StorageManagerImpl as stManager
 
-from main.analyzer.util import search_results
+from main.analyzer.util import save_simple_search_results
 from main.cleaner import clean_cache
 from main.files_managers.picker.picker import file_picker
 from main.files_managers.picker.util import (
@@ -105,7 +104,7 @@ def client():
                 path = input("Enter a path of file: ")
                 request = input("Enter a search request: ")
                 result = job.simple_search_client(request, path)
-                success = search_results(result)
+                success = save_simple_search_results(result)
             case "search-req-folder" | "-s -d":
                 print("Making search request in one chosen folder...")
             case "search-req-group" | "-s -list":
@@ -114,16 +113,20 @@ def client():
                 print("Making multiple search requests...")
             case "show-files" | "-t -f":
                 print("Reviewing file storage...")
-                stManager.show_file_info_data_storage(man)
+                success = stManager.show_file_info_data_storage(man)
+                result = {"success": success}
             case "show-data" | "-t -d":
                 print("Reviewing processed data storage...")
-                stManager.show_processed_data_storage(man)
+                success = stManager.show_processed_data_storage(man)
+                result = {"success": success}
             case "show-errors" | "-t -e":
                 print("Reviewing error storage...")
-                stManager.show_error_storage(man)
+                success = stManager.show_error_storage(man)
+                result = {"success": success}
             case "show-all" | "-t -all":
                 print("Reviewing all storages...")
-
+                success = stManager.show_all_data_storage(man)
+                result = {"success": success}
             case "pycache-clean" | "-clean":
                 print("Cleaning cache...")
                 atexit.register(clean_cache)

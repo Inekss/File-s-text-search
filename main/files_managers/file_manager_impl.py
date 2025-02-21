@@ -2,6 +2,7 @@ import codecs
 import os
 
 import chardet
+from docx import Document
 
 from main.files_managers.file_manager import FileManager
 from main.local_logger.custom_exceptions.file_not_exist_exception import (
@@ -13,7 +14,7 @@ from main.local_logger.custom_exceptions.unable_read_file_exception import (
 
 
 class FileManagerImpl(FileManager):
-    def file_exist(self, file_path) -> bool:
+    def file_exist(self, file_path: str) -> bool:
         if not os.path.isfile(file_path):
             try:
                 raise FileNotExistException("reader: No file in directory")
@@ -21,29 +22,51 @@ class FileManagerImpl(FileManager):
                 return False
         return True
 
-    def simple_search_txt_log_json(self, search_term: str, path: str) -> str:
+    def simple_search_txt_log_json(
+        self, search_term: str, path: str
+    ) -> list[dict[str, dict[int, str]]]:
         def detect_encoding(encoding_path):
-            with open(encoding_path, "rb") as f:
-                raw_data = f.read(1000)
-            result = chardet.detect(raw_data)
-            return result["encoding"]
+            try:
+                with open(encoding_path, "rb") as f:
+                    raw_data = f.read(5000)
+                result = chardet.detect(raw_data)
+                return result.get("encoding", "utf-8")
+            except Exception:
+                try:
+                    raise UnableReadFileException(f"reader: corrupted file TO READ {e}")
+                except UnableReadFileException:
+                    return []
 
         encoding = detect_encoding(path)
-
-        if not encoding:
-            return ""
 
         try:
             matches = []
             with codecs.open(path, "r", encoding=encoding, errors="ignore") as file:
                 for i, line in enumerate(file, start=1):
                     if search_term.lower() in line.lower():
-                        matches.append(f"{i}: {line.strip()}")
+                        matches.append({"match": {i: line.strip()}})
+            return matches
+        except Exception as e:
+            try:
+                raise UnableReadFileException(f"reader: corrupted file TO READ {e}")
+            except UnableReadFileException:
+                return []
 
-            return "\n".join(matches) if matches else ""
+    def simple_search_in_docx(
+        self, search_term: str, path: str
+    ) -> list[dict[str, dict[int, str]]]:
+        try:
+            doc = Document(path)
+            matches = []
+
+            for i, para in enumerate(doc.paragraphs, start=1):
+                if search_term.lower() in para.text.lower():
+                    matches.append({"match": {i: para.text.strip()}})
+
+            return matches
 
         except Exception as e:
             try:
                 raise UnableReadFileException(f"reader: corrupted file TO READ {e}")
             except UnableReadFileException:
-                return ""
+                return []
