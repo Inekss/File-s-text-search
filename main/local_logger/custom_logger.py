@@ -13,7 +13,7 @@ class CustomLogger:
                 with open(file_path, "w") as json_file:
                     json.dump({}, json_file)
                 return False
-            except Exception as e:
+            except Exception:
                 return False
 
         return True

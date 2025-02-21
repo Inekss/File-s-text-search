@@ -5,7 +5,7 @@ from main.local_logger.custom_logger import CustomLogger
 logger = CustomLogger()
 
 
-class FileNotExistException(Exception):
+class UnsupportedFormatException(Exception):
     """Custom exception for file properties validation errors."""
 
     def __init__(self, message: str):
@@ -14,8 +14,8 @@ class FileNotExistException(Exception):
         dict_message = {
             "error": {
                 "error_status": True,
-                "error_type": "file_not_exists",
-                "error_message": "not found",
+                "error_type": "file_format",
+                "error_message": "unsupported file format",
                 "error_description": message,
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
             }

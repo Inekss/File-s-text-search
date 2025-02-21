@@ -14,7 +14,7 @@ class SaveJsonException(Exception):
         dict_message = {
             "error": {
                 "error_status": True,
-                "error_type": "upload issue",
+                "error_type": "st_save_issue",
                 "error_message": "can not save JSON",
                 "error_description": message,
                 "error_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
