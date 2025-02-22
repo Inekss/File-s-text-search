@@ -3,7 +3,7 @@ import atexit
 import job
 from files_managers.storage_manager_impl import StorageManagerImpl as stManager
 
-from main.analyzer.util import save_simple_search_results
+from main.files_managers.util import save_simple_search_results
 from main.cleaner import clean_cache
 from main.files_managers.picker.picker import file_picker
 from main.files_managers.picker.util import (
@@ -30,7 +30,7 @@ commands_list = [
     "add-folder-path",
     "-a -d -p",
     "clear-database",
-    "-rm -c",
+    "-rm -all",
     "remove-file",
     "-rm -f",
     "remove-folder",
@@ -91,16 +91,23 @@ def client():
                 print("Adding file using its system path...")
             case "add-folder-path" | "-a -d -p":
                 print("Adding folder using its system path...")
-            case "clear-database" | "-rm -c":
+            case "clear-database" | "-rm -all":
                 print("Clearing all databases...")
+                success = stManager.clear_st(man)
+                result = {"success": success}
             case "remove-file" | "-rm -f":
                 print("Removing file from database...")
+                stManager.show_file_info_data_storage(man)
+                data_path = input("Enter a path of file: ")
+                success = stManager.remove_file_info(man, data_path)
+                result = {"success": success}
             case "remove-folder" | "-rm -d":
                 print("Removing folder from database...")
             case "search-req-all" | "-s -all":
                 print("Making search request through all database...")
             case "search-req-file" | "-s -f":
                 print("Searching in one chosen file...")
+                stManager.show_file_info_data_storage(man)
                 path = input("Enter a path of file: ")
                 request = input("Enter a search request: ")
                 result = job.simple_search_client(request, path)

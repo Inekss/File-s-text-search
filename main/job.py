@@ -19,12 +19,14 @@ def simple_search_client(search_request: str, path: str) -> dict:
             return {}
 
     match path.lower():
-        case path if path.endswith(".docx"):
+        case path if path.endswith(".docx") or path.endswith(".doc"):
             output = FileManager.simple_search_in_docx(fman, search_request, path)
         case path if path.endswith(".txt") or path.endswith(".log") or path.endswith(
             ".json"
         ):
             output = FileManager.simple_search_txt_log_json(fman, search_request, path)
+        case path if path.endswith(".pdf"):
+            output = FileManager.simple_search_pdf(fman, search_request, path)
         case _:
             try:
                 raise UnsupportedFormatException(
