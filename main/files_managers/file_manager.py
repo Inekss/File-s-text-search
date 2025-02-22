@@ -18,3 +18,8 @@ class FileManager:
         self, search_term: str, path: str
     ) -> list[dict[str, dict[int, str]]]:
         pass
+
+    def simple_search_pdf(
+        self, search_term: str, path: str
+    ) -> list[dict[str, dict[int, str]]]:
+        pass

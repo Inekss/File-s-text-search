@@ -3,6 +3,7 @@ import os
 
 import chardet
 from docx import Document
+import pdfplumber
 
 from main.files_managers.file_manager import FileManager
 from main.local_logger.custom_exceptions.file_not_exist_exception import (
@@ -70,3 +71,24 @@ class FileManagerImpl(FileManager):
                 raise UnableReadFileException(f"reader: corrupted file TO READ {e}")
             except UnableReadFileException:
                 return []
+
+    def simple_search_pdf(
+        self, search_term: str, path: str
+    ) -> list[dict[str, dict[int, str]]]:
+        try:
+            matches = []
+
+            with pdfplumber.open(path) as pdf:
+                for page_num, page in enumerate(pdf.pages, start=1):
+                    text = page.extract_text()
+                    if text:
+                        lines = text.split("\n")
+                        for i, line in enumerate(lines, start=1):
+                            if search_term.lower() in line.lower():
+                                key = f"{i}.{page_num}"
+                                matches.append({"match": {key: line.strip()}})
+
+            return matches
+
+        except Exception:
+            return []

@@ -65,6 +65,45 @@ class StorageManagerImpl(StorageFileManager):
                 raise SaveJsonException(f"❌ Failed to write data to {file_path}: {e}")
         return False
 
+    def remove_file_info(self, data: str) -> bool:
+        data_folder = r"data_storage"
+        data_path = os.path.join(data_folder, "file_info.json")
+
+        file_data = self.load_data_from_storage(data_path)
+
+        if data in file_data:
+            del file_data[data]
+            with open(data_path, "w") as json_file:
+                json.dump(file_data, json_file, indent=4)
+
+            return True
+        else:
+            print(f"⚠ File path {data} not found in file_info.json.")
+        return False
+
+    def clear_st(self) -> bool:
+        data_folder = r"data_storage"
+        data_path = os.path.join(data_folder, "error_data.json")
+        if not self.data_storage_exists(data_path):
+            return False
+        with open(data_path, "w") as json_file:
+            json.dump({}, json_file)
+
+        data_path = os.path.join(data_folder, "file_info.json")
+        if not self.data_storage_exists(data_path):
+            return False
+        with open(data_path, "w") as json_file:
+            json.dump({}, json_file)
+
+        data_folder = r"data_storage"
+        data_path = os.path.join(data_folder, "processed_data.json")
+        if not self.data_storage_exists(data_path):
+            return False
+        with open(data_path, "w") as json_file:
+            json.dump({}, json_file)
+
+        return True
+
     def show_error_storage(self) -> bool:
         data_folder = "data_storage"
         data_path = os.path.join(data_folder, r"error_data.json")

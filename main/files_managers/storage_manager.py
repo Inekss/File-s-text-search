@@ -16,6 +16,13 @@ class StorageFileManager:
         pass
 
     @abstractmethod
+    def remove_file_info(self, data: str) -> bool:
+        pass
+
+    def clear_st(self) -> bool:
+        pass
+
+    @abstractmethod
     def show_error_storage(self) -> bool:
         pass
 

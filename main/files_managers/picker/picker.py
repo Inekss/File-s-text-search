@@ -18,9 +18,9 @@ def file_picker() -> dict:
     root.focus_force()  # Force focus
     file_path = filedialog.askopenfilename(
         title="Select a File",
-        filetypes=(("Text files", "*.txt"), ("All files", "*.*")),
+        filetypes=(("All files", "*.*"),),
     )
-    root.withdraw()  # Hide the root window again
+    root.withdraw()
 
     if file_path:
         try:
