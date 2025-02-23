@@ -9,6 +9,7 @@ from main.files_managers.file_manager import FileManager
 from main.local_logger.custom_exceptions.file_not_exist_exception import (
     FileNotExistException,
 )
+from main.local_logger.custom_exceptions.permission_exception import PermissionException
 from main.local_logger.custom_exceptions.unable_read_file_exception import (
     UnableReadFileException,
 )
@@ -38,7 +39,13 @@ class FileManagerImpl(FileManager):
                 except UnableReadFileException:
                     return []
 
-        encoding = detect_encoding(path)
+        try:
+            encoding = detect_encoding(path)
+        except Exception as e:
+            try:
+                raise PermissionException(str(e))
+            except PermissionException:
+                return []
 
         try:
             matches = []

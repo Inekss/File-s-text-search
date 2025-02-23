@@ -37,3 +37,6 @@ class StorageFileManager:
     @abstractmethod
     def show_all_data_storage(self) -> bool:
         pass
+
+    def get_st_files_path(self) -> list:
+        pass

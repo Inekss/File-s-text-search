@@ -1,4 +1,8 @@
 from main.files_managers.file_manager_impl import FileManagerImpl as FileManager
+from main.files_managers.storage_manager_impl import (
+    StorageManagerImpl as StorageManager,
+)
+from main.files_managers.util import save_simple_search_results
 from main.local_logger.custom_exceptions.invalid_input_exception import (
     InvalidInputException,
 )
@@ -7,6 +11,7 @@ from main.local_logger.custom_exceptions.unsupported_format_exception import (
 )
 
 fman = FileManager()
+stman = StorageManager()
 
 
 def simple_search_client(search_request: str, path: str) -> dict:
@@ -46,8 +51,16 @@ def simple_search_client(search_request: str, path: str) -> dict:
         }
 
 
+def simple_global_search_client(search_request: str):
+    results = StorageManager.get_st_files_path(stman)
+
+    for result in results:
+        print(result)
+        data = simple_search_client(search_request, result)
+        save_simple_search_results(data)
+        continue
+    return True
+
+
 if __name__ == "__main__":
-    file_path = r"requirements.txt"
-    request = "black"
-    find = reader(request, file_path)
-    print(find)
+    simple_global_search_client("design")
