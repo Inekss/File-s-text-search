@@ -169,3 +169,14 @@ class StorageManagerImpl(StorageFileManager):
             return False
         print()
         return True
+
+    def get_st_files_path(self) -> list:
+        data_folder = r"data_storage"
+        data_path = os.path.join(data_folder, "file_info.json")
+
+        if not self.data_storage_exists(data_path):
+            return []
+
+        files = self.load_data_from_storage(data_path)
+
+        return list(files.keys())

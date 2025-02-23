@@ -8,7 +8,7 @@ from main.local_logger.custom_exceptions.required_keys_exception import (
 man = Man()
 
 
-def construct_files_properties(properties) -> bool:
+def construct_files_properties(properties: dict) -> bool:
     """Stores file metadata into 'file_info.json'."""
     data_folder = r"data_storage"
     required_keys = {"file_path", "file_name", "file_size", "file_format"}
@@ -36,3 +36,40 @@ def construct_files_properties(properties) -> bool:
     except Exception:
         return False
     return success
+
+
+def get_file_properties(file_path: str, file_info: dict) -> dict:
+    """
+    Extracts and returns file properties.
+    :param file_path: Path of the file.
+    :param file_info: Dictionary containing file details.
+    :return: Dictionary with file properties.
+    """
+    return {
+        "file_path": file_path,
+        "file_name": file_info["file_name"],
+        "file_size": file_info["file_size"],
+        "file_format": file_info["file_format"],
+    }
+
+
+def analyze_folder_files(properties: dict) -> bool:
+    """
+    Analyzes folder files and returns structured data.
+    :param properties: Dictionary containing folder properties.
+    :return: Dictionary with analyzed folder data.
+    """
+    if not properties.get("selected_files"):
+        try:
+            raise RequiredKeysException("selected_files")
+        except RequiredKeysException:
+            return False
+
+    selected_files = properties["selected_files"]
+    for file_path, file_info in selected_files.items():
+        data = get_file_properties(file_path, file_info)
+        success = construct_files_properties(data)
+        if not success:
+            return False
+
+    return True
